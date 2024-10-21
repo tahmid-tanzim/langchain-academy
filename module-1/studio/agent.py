@@ -1,62 +1,44 @@
 from langchain_core.messages import SystemMessage
+from langchain_core.tools import tool
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 from langgraph.graph import START, StateGraph, MessagesState
 from langgraph.prebuilt import tools_condition, ToolNode
-from pydantic import BaseModel, Field
 
 
-# def add(a: int, b: int) -> int:
-#     """Adds a and b.
-#
-#     Args:
-#         a: first int
-#         b: second int
-#     """
-#     return a + b
+@tool
+def add(a: int, b: int) -> int:
+    """Adds a and b.
 
-class Add(BaseModel):
-    """Adds two integers together."""
+    Args:
+        a: first int
+        b: second int
+    """
+    return a + b
 
-    a: int = Field(..., description="First integer")
-    b: int = Field(..., description="Second integer")
+@tool
+def multiply(a: int, b: int) -> int:
+    """Multiplies a and b.
 
-# def multiply(a: int, b: int) -> int:
-#     """Multiplies a and b.
-#
-#     Args:
-#         a: first int
-#         b: second int
-#     """
-#     return a * b
+    Args:
+        a: first int
+        b: second int
+    """
+    return a * b
 
 
-class Multiply(BaseModel):
-    """Multiply two integers together."""
+@tool
+def divide(a: int, b: int) -> float:
+    """Divide a and b.
 
-    a: int = Field(..., description="First integer")
-    b: int = Field(..., description="Second integer")
-
-
-# def divide(a: int, b: int) -> float:
-#     """Divide a and b.
-#
-#     Args:
-#         a: first int
-#         b: second int
-#     """
-#     return a / b
+    Args:
+        a: first int
+        b: second int
+    """
+    return a / b
 
 
-class Divide(BaseModel):
-    """Divide two integers a and b."""
-
-    a: int = Field(..., description="First integer")
-    b: int = Field(..., description="Second integer")
-
-
-# tools = [add, multiply, divide]
-tools = [Add, Multiply, Divide]
+tools = [add, multiply, divide]
 
 # Define LLM with bound tools
 llm = ChatGoogleGenerativeAI(

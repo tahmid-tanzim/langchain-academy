@@ -1,26 +1,22 @@
-# from langchain_openai import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import MessagesState
 from langgraph.graph import StateGraph, START, END
 from langgraph.prebuilt import ToolNode, tools_condition
-from pydantic import BaseModel, Field
+from langchain_core.tools import tool
 
 
-# Tool
-class Multiply(BaseModel):
-    """Multiply two integers together."""
-
-    a: int = Field(..., description="First integer")
-    b: int = Field(..., description="Second integer")
+@tool
+def multiply(a: int, b: int) -> int:
+    """Multiplies a and b."""
+    return a * b
 
 
 # LLM with bound tool
-# llm = ChatOpenAI(model="gpt-4o")
 llm = ChatGoogleGenerativeAI(
     model="gemini-1.5-pro",
     temperature=0,
 )
-llm_with_tools = llm.bind_tools([Multiply])
+llm_with_tools = llm.bind_tools([multiply])
 
 
 # Node
@@ -31,7 +27,7 @@ def tool_calling_llm(state: MessagesState):
 # Build graph
 builder = StateGraph(MessagesState)
 builder.add_node("tool_calling_llm", tool_calling_llm)
-builder.add_node("tools", ToolNode([Multiply]))
+builder.add_node("tools", ToolNode([multiply]))
 builder.add_edge(START, "tool_calling_llm")
 builder.add_conditional_edges(
     "tool_calling_llm",
