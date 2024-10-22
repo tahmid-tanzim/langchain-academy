@@ -1,4 +1,4 @@
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 from langgraph.graph import MessagesState
 from langgraph.graph import StateGraph, START, END
 from langgraph.prebuilt import ToolNode, tools_condition
@@ -12,8 +12,8 @@ def multiply(a: int, b: int) -> int:
 
 
 # LLM with bound tool
-llm = ChatGoogleGenerativeAI(
-    model="gemini-1.5-pro",
+llm = ChatOpenAI(
+    model="gpt-4o",
     temperature=0,
 )
 llm_with_tools = llm.bind_tools([multiply])

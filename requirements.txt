@@ -8,5 +8,4 @@ langchain-openai
 notebook
 tavily-python
 wikipedia
-langchain-google-genai
 ipywidgets
