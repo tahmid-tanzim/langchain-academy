@@ -10,9 +10,9 @@ from langchain_core.tools import tool
 
 
 @tool
-def plus(x: int, y: int) -> int:
+def add(x: int, y: int) -> int:
     """
-    Add x and y.
+    Adds x and y.
     Args:
         x: first int
         y: second int
@@ -21,7 +21,7 @@ def plus(x: int, y: int) -> int:
 
 
 @tool
-def minus(x: int, y: int) -> int:
+def subtract(x: int, y: int) -> int:
     """
     Subtract y from x.
     Args:
@@ -41,6 +41,15 @@ def multiply(a: int, b: int) -> int:
     """
     return a * b
 
+
+@tool
+def divide(a: int, b: int) -> float:
+    """
+    Divide a and b.
+    Args:
+        a: first int
+        b: second int
+    """
 
 @tool
 def modulo(a: int, b: int) -> int:
@@ -76,8 +85,8 @@ def get_large_value(a: int, b: int) -> int:
 
 
 tools_list = [
-    plus,
-    minus,
+    add,
+    subtract,
     multiply,
     modulo,
     get_small_value,

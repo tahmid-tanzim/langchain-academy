@@ -1,26 +1,25 @@
 from langchain_core.messages import SystemMessage
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
-
 from langgraph.graph import START, StateGraph, MessagesState
 from langgraph.prebuilt import tools_condition, ToolNode
 
 
 @tool
-def add(a: int, b: int) -> int:
-    """Adds a and b.
-
-    Args:
-        a: first int
-        b: second int
+def add(x: int, y: int) -> int:
     """
-    return a + b
+    Adds x and y.
+    Args:
+        x: first int
+        y: second int
+    """
+    return x + y
 
 
 @tool
 def multiply(a: int, b: int) -> int:
-    """Multiplies a and b.
-
+    """
+    Multiplies a and b.
     Args:
         a: first int
         b: second int
@@ -30,8 +29,8 @@ def multiply(a: int, b: int) -> int:
 
 @tool
 def divide(a: int, b: int) -> float:
-    """Divide a and b.
-
+    """
+    Divide a and b.
     Args:
         a: first int
         b: second int
@@ -39,7 +38,18 @@ def divide(a: int, b: int) -> float:
     return a / b
 
 
-tools = [add, multiply, divide]
+@tool
+def modulo(a: float, b: int) -> float:
+    """
+    Remainder of a division b.
+    Args:
+        a: first int
+        b: second int
+    """
+    return a % b
+
+
+tools = [add, multiply, divide, modulo]
 
 # Define LLM with bound tools
 llm = ChatOpenAI(
@@ -50,7 +60,8 @@ llm_with_tools = llm.bind_tools(tools)
 
 # System message
 sys_msg = SystemMessage(
-    content="You are a helpful assistant tasked with writing performing arithmetic on a set of inputs.")
+    content="You are a helpful assistant tasked with writing performing arithmetic on a set of inputs."
+)
 
 
 # Node
@@ -60,8 +71,12 @@ def assistant(state: MessagesState):
 
 # Build graph
 builder = StateGraph(MessagesState)
+
+# Nodes
 builder.add_node("assistant", assistant)
 builder.add_node("tools", ToolNode(tools))
+
+# Edges
 builder.add_edge(START, "assistant")
 builder.add_conditional_edges(
     "assistant",
