@@ -4,14 +4,24 @@ from openai import OpenAI
 from dotenv import load_dotenv, find_dotenv
 
 _ = load_dotenv(find_dotenv())  # read local .env file
-GPT_MODEL = "gpt-3.5-turbo-0125"
 client = OpenAI(
-    api_key=os.environ['OPENAI_API_KEY'],  # This is the default and can be omitted
+    api_key=os.environ['OPENAI_API_KEY'],
 )
 
 
-def get_completion(prompt, model=GPT_MODEL):
-    messages = [{"role": "user", "content": [{"type": "text", "text": prompt}]}]
+# 1. Chat API : OpenAI
+def get_completion(prompt, model="gpt-3.5-turbo-0125"):
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": prompt
+                }
+            ]
+        }
+    ]
     response = client.chat.completions.create(
         model=model,
         messages=messages,
