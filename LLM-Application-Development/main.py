@@ -1,33 +1,29 @@
 import os
-from openai import OpenAI
-
 from dotenv import load_dotenv, find_dotenv
+from langchain_openai import ChatOpenAI
+from langchain.prompts import ChatPromptTemplate
 
 _ = load_dotenv(find_dotenv())  # read local .env file
-client = OpenAI(
-    api_key=os.environ['OPENAI_API_KEY'],
+
+client = ChatOpenAI(
+    model="gpt-3.5-turbo-0125",
+    openai_api_key=os.environ['OPENAI_API_KEY'],
+    temperature=0.0,
 )
 
+template_string = """What is {a} + {b}?"""
+a = 198
+b = 2.75
 
-# 1. Chat API : OpenAI
-def get_completion(prompt, model="gpt-3.5-turbo-0125"):
-    messages = [
-        {
-            "role": "user",
-            "content": [
-                {
-                    "type": "text",
-                    "text": prompt
-                }
-            ]
-        }
-    ]
-    response = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        temperature=0,
-    )
-    return response.choices[0].message.content
+prompt_template = ChatPromptTemplate.from_template(template_string, input_types={"a": int, "b": float})
+print(prompt_template)
+
+prompt_messages = prompt_template.format_messages(a=a, b=b)
+
+print(prompt_messages)
+
+# Call the LLM to translate to the style of the customer message
+llm_response = client.invoke(prompt_messages)
+print("LLM Response -", llm_response.content)
 
 
-print(get_completion("What is 2.3 + 1.75?"))
