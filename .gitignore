@@ -218,3 +218,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Additional Doc
+LLM-Application-Development/data/MachineLearning-Lecture01.pdf
+LLM-Application-Development/data/Blendle's Employee Handbook e367aa77e225482c849111687e114a56.md

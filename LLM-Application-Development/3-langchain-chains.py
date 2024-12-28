@@ -78,7 +78,7 @@ combined_chain = SequentialChain(
     verbose=True
 )
 
-df = pd.read_csv('data.csv')
+df = pd.read_csv('data/product_reviews.csv')
 
 review = df.Review[5]
 response = combined_chain(review)
