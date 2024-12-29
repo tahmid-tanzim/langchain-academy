@@ -43,25 +43,35 @@ split_text = text_splitter.split_documents(docs)
 print("split_text count -", len(split_text))
 
 # 3. Embeddings
-embedding = OpenAIEmbeddings()
+embeddings_model = OpenAIEmbeddings(model="text-embedding-3-large",)
 sports1 = "cricket"
 sports2 = "football"
-sports3 = "rugby"
-embedding1 = embedding.embed_query(sports1)
-embedding2 = embedding.embed_query(sports2)
-embedding3 = embedding.embed_query(sports3)
+sports3 = "soccer"
+
+embedding1 = embeddings_model.embed_query(sports1)
+embedding2 = embeddings_model.embed_query(sports2)
+embedding3 = embeddings_model.embed_query(sports3)
+
 print(f"1. Embedding ({len(embedding1)}) -", embedding1)
 print(f"2. Embedding ({len(embedding2)}) -", embedding2)
 print(f"3. Embedding ({len(embedding3)}) -", embedding3)
 
-print(f"Embedding Similarity ({sports1} vs {sports2}) -", np.dot(embedding1, embedding2))
-print(f"Embedding Similarity ({sports1} vs {sports3}) -", np.dot(embedding1, embedding3))
-print(f"Embedding Similarity ({sports2} vs {sports3}) -", np.dot(embedding2, embedding3))
+
+def cosine_similarity(vec1, vec2):
+    dot_product = np.dot(vec1, vec2)
+    norm_vec1 = np.linalg.norm(vec1)
+    norm_vec2 = np.linalg.norm(vec2)
+    return dot_product / (norm_vec1 * norm_vec2)
+
+
+print(f"Embedding Similarity ({sports1} vs {sports2}) -", cosine_similarity(embedding1, embedding2))
+print(f"Embedding Similarity ({sports1} vs {sports3}) -", cosine_similarity(embedding1, embedding3))
+print(f"Embedding Similarity ({sports2} vs {sports3}) -", cosine_similarity(embedding2, embedding3))
 
 # 4. Vector stores
 vectordb = Chroma(
     collection_name="machine_learning_lecture",
-    embedding_function=embedding,
+    embedding_function=embeddings_model,
     persist_directory='./vectordb',
 )
 
