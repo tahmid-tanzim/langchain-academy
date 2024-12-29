@@ -69,21 +69,21 @@ print(f"Embedding Similarity ({sports1} vs {sports3}) -", cosine_similarity(embe
 print(f"Embedding Similarity ({sports2} vs {sports3}) -", cosine_similarity(embedding2, embedding3))
 
 # 4. Vector stores
-vectordb = Chroma(
+vectorDB = Chroma(
     collection_name="machine_learning_lecture",
     embedding_function=embeddings_model,
-    persist_directory='./vectordb',
+    persist_directory='./vectorDB',
 )
 
 uuids = [str(uuid4()) for _ in range(len(split_text))]
-vectordb.add_documents(documents=split_text, ids=uuids)
-vectordb.persist()
+vectorDB.add_documents(documents=split_text, ids=uuids)
+vectorDB.persist()
 
-print("DB Count -", vectordb._collection.count())
+print("DB Count -", vectorDB._collection.count())
 
 # 5. Similarity Search
 question = "what did they say about matlab?"
-search_result = vectordb.similarity_search_with_score(question, k=5)
+search_result = vectorDB.similarity_search_with_score(question, k=5)
 
 print(f"Similarity Search Score ({search_result[0][1]}) -", search_result[0][0].page_content)
 print(f"\n\nSimilarity Search Score ({search_result[1][1]}) -", search_result[1][0].page_content)
