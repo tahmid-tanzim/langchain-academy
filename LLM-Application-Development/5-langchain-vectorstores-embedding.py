@@ -2,11 +2,13 @@ import warnings
 import numpy as np
 
 from uuid import uuid4
+from embedding import LocalEmbedding
 from dotenv import load_dotenv, find_dotenv
 
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import OpenAIEmbeddings
+# from chromadb.utils import embedding_functions
 from langchain_community.vectorstores import Chroma
 from langchain_community.llms import OpenAI
 from langchain.retrievers.self_query.base import SelfQueryRetriever
@@ -50,7 +52,7 @@ split_text = text_splitter.split_documents(docs)
 print("split_text count -", len(split_text))
 
 # 3. Embeddings
-embeddings_model = OpenAIEmbeddings(model="text-embedding-3-large", )
+embeddings_model = OpenAIEmbeddings(model="text-embedding-3-small", )
 
 
 def cosine_similarity(vec1, vec2):
@@ -61,13 +63,15 @@ def cosine_similarity(vec1, vec2):
 
 
 def sport_embeddings():
+    local_embeddings_model = LocalEmbedding()
+
     sports1 = "cricket"
     sports2 = "football"
     sports3 = "soccer"
 
-    embedding1 = embeddings_model.embed_query(sports1)
-    embedding2 = embeddings_model.embed_query(sports2)
-    embedding3 = embeddings_model.embed_query(sports3)
+    embedding1 = local_embeddings_model.embed_query(sports1)
+    embedding2 = local_embeddings_model.embed_query(sports2)
+    embedding3 = local_embeddings_model.embed_query(sports3)
 
     print(f"1. Embedding ({len(embedding1)}) -", embedding1)
     print(f"2. Embedding ({len(embedding2)}) -", embedding2)
@@ -78,7 +82,7 @@ def sport_embeddings():
     print(f"Embedding Similarity ({sports2} vs {sports3}) -", cosine_similarity(embedding2, embedding3))
 
 
-sport_embeddings()
+# sport_embeddings()
 
 
 # 4. Vector stores
@@ -154,8 +158,8 @@ def test_self_query_retriever():
     search_result_4 = retriever.get_relevant_documents(question_2)
     """
     search_result_4:
-    query='regression' 
-    filter=Comparison(comparator=<Comparator.EQ: 'eq'>, attribute='source', value='data/MachineLearning-Lecture03.pdf') 
+    query='regression'
+    filter=Comparison(comparator=<Comparator.EQ: 'eq'>, attribute='source', value='data/MachineLearning-Lecture03.pdf')
     limit=None
     """
     for r4 in search_result_4:

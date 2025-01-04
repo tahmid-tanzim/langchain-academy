@@ -190,6 +190,7 @@ safetensors==0.4.5
 scikit-learn==1.6.0
 scipy==1.14.1
 Send2Trash==1.8.3
+sentence-transformers==3.3.1
 setuptools==75.6.0
 shapely==2.0.6
 shellingham==1.5.4
