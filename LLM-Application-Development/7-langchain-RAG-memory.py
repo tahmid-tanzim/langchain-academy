@@ -5,8 +5,9 @@ from dotenv import load_dotenv, find_dotenv
 from langchain_community.chat_models import ChatOpenAI
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import OpenAIEmbeddings
-from langchain.chains import RetrievalQA
+from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
+from langchain.memory import ConversationBufferMemory
 
 warnings.filterwarnings('ignore')
 _ = load_dotenv(find_dotenv())  # read local .env file
@@ -22,14 +23,7 @@ vectorDB = Chroma(
 # 2. Test vector store loaded successfully
 print(vectorDB._collection.count())
 
-# 3. Retrieval: Testing Similarity Search
-question = "What are major topics for this class?"
-docs = vectorDB.max_marginal_relevance_search(question, k=2, fetch_k=3)
-print("Question:", question)
-print("Search Result:")
-print(f"\n{'-' * 100}\n".join([f"Document {i + 1}:\n\n" + d1.page_content for i, d1 in enumerate(docs)]))
-
-# 4. Load LLM
+# 3. Load LLM
 llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
 
 # 5. Build prompt
@@ -41,29 +35,25 @@ Question: <{question}>
 Helpful Answer:"""
 QA_CHAIN_PROMPT = PromptTemplate.from_template(template)
 
-# 6. RetrievalQA chain
-# Inject top 2 retrieval from vector DB
-# Default Chain Type
-qa_chain = RetrievalQA.from_chain_type(
+# 6. Memory to remember previous chat history
+memory = ConversationBufferMemory(
+    memory_key="chat_history",
+    return_messages=True
+)
+
+
+# 7. ConversationalRetrievalChain
+qa_chain = ConversationalRetrievalChain.from_llm(
     llm,
     retriever=vectorDB.as_retriever(),
-    return_source_documents=True,
-    chain_type_kwargs={"prompt": QA_CHAIN_PROMPT}
+    memory=memory,
+    # chain_type_kwargs={"prompt": QA_CHAIN_PROMPT}
 )
-question = "Is probability a class topic?"
-response = qa_chain({"query": question})
-print("\nLLM Response -", response["result"], end="\n")
-print("\nSource Documents -", response["source_documents"], end="\n")
 
-# 7. Chain type - map_reduce
-# qa_chain_mr = RetrievalQA.from_chain_type(
-#     llm,
-#     retriever=vectorDB.as_retriever(),
-#     chain_type="map_reduce"
-# )
-#
-# qa_chain_mr = RetrievalQA.from_chain_type(
-#     llm,
-#     retriever=vectorDB.as_retriever(),
-#     chain_type="refine"
-# )
+question = "Is probability a class topic?"
+response = qa_chain({"question": question})
+print("\nLLM Response 1 -", response["answer"], end="\n")
+
+question = "What are those prerequisites needed?"
+response = qa_chain({"question": question})
+print("\nLLM Response 2 -", response["answer"], end="\n")
